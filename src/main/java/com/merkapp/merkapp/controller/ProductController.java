@@ -1,6 +1,6 @@
 package com.merkapp.merkapp.controller;
 
-import com.merkapp.merkapp.model.ProductEntity;
+import com.merkapp.merkapp.model.Product;
 import com.merkapp.merkapp.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,27 +12,22 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api/v1/product")
 public class ProductController {
 
-    private final ProductService productService;
-
     @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
+    public ProductService productService;
 
     @GetMapping
-    public List<ProductEntity> obtenerProductos() {
+    public List<Product> obtenerProductos() {
         return productService.obtenerProductos();
     }
 
     @GetMapping("/{id}")
-    public ProductEntity obtenerProduct(@PathVariable Long id) {
-        Optional<ProductEntity> productEntity = productService.obtenerProducto(id);
+    public Product obtenerProduct(@PathVariable Long id) {
+        Optional<Product> productEntity = productService.obtenerProducto(id);
         return productEntity.orElse(null);
     }
-
 
     // TO DO: Hacer crear, actualizar y crear
 

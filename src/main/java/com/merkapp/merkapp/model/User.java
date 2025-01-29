@@ -1,27 +1,54 @@
 package com.merkapp.merkapp.model;
 
+import java.util.Collection;
+import java.util.Set;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.merkapp.merkapp.enums.Role;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column
     private String username;
+
+    @Column
+    private String email;
+
+    @Column
     private String password;
 
-    public User() {}
+    private Set<Role> authorities;
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-
+    public User() {
     }
 
+    public User(String username, String email, String password, Set<Role> authorities) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.authorities = authorities;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getPassword() {
         return password;
@@ -55,4 +82,10 @@ public class User {
                 ", password='" + password + '\'' +
                 '}';
     }
+
+    @Override
+    public Set<Role> getAuthorities() {
+        return this.authorities;
+    }
+
 }
