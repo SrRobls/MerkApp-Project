@@ -5,26 +5,82 @@ export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    padding: theme.spacing.medium,
+    alignItems: 'center', // Centrado de contenido en la pantalla
   },
   text: {
     color: theme.colors.text,
     fontSize: theme.fontSize.medium,
+    textAlign: 'left', // Aseguramos que los textos estén alineados a la izquierda
   },
   title: {
     color: theme.colors.text,
     fontSize: theme.fontSize.large,
     fontWeight: 'bold',
+    marginBottom: theme.spacing.small,
+    textAlign: 'left', // Justificado a la izquierda
+  },
+  subtitle: {
+    fontSize: theme.fontSize.medium,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.medium,
+    textAlign: 'left', // Justificado a la izquierda
   },
   button: {
     backgroundColor: theme.colors.primary,
-    padding: theme.spacing.medium,
+    paddingVertical: theme.spacing.medium,
     borderRadius: theme.borderRadius.medium,
+    borderColor: theme.colors.text,
+    borderWidth: 2,
     alignItems: 'center',
+    width: '100%',
+    marginTop: theme.spacing.medium,
   },
   buttonText: {
-    color: 'white',
+    color: theme.colors.surface,
     fontSize: theme.fontSize.medium,
     fontWeight: 'bold',
+  },
+  input: {
+    width: '100%',
+    padding: theme.spacing.small,
+    borderWidth: 3,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.medium,
+    backgroundColor: theme.colors.surface,
+    marginBottom: theme.spacing.large,
+    fontSize: theme.fontSize.medium,
+
+  },
+  label: {
+    fontSize: theme.fontSize.medium,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.small,
+    textAlign: 'left',
+  },
+  registerText: {
+    marginTop: theme.spacing.large,
+    fontSize: theme.fontSize.medium,
+    color: theme.colors.text,
+    textAlign: 'center',
+    marginBottom: theme.spacing.large,
+  },
+  bold: {
+    fontWeight: 'bold',
+  },
+  image: {
+    width: '100%',
+    height: 300,
+    resizeMode: 'cover',
+  },
+  logo: {
+    width: '100%',
+    height: 120,
+    resizeMode: 'contain',
+    marginTop: theme.spacing.large,
+  },
+  innerContainer: {
+    width: '90%',
+    alignItems: 'flex-start', // Alineamos los elementos a la izquierda
+    marginTop: theme.spacing.large,
   },
 });

@@ -1,8 +1,8 @@
 export const theme = {
     colors: {
-      primary: '#049a0e',  // Color principal (morado)
+      primary: '#049a0e',  // Color principal (verde)
       secondary: '#4cbd53', // Color secundario (verde agua)
-      background: '#b9f1bd', // Fondo claro
+      background: '#b9f1bd', // Fondo verde claro
       surface: '#ffffff', // Superficies blancas
       error: '#B00020', // Rojo para errores
       text: '#000000', // Texto principal
@@ -25,5 +25,9 @@ export const theme = {
       small: 5,
       medium: 10,
       large: 20,
+    },
+    fontFamily: {
+      regular: 'System', // Usar la fuente del sistema por defecto
+      bold: 'System-Bold', // Fuente en negrita del sistema
     },
   };
