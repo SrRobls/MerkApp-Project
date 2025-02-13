@@ -100,6 +100,26 @@ El cual te ejecutara la app directamente en el emulador de Android Studio.
   ./gradlew clean
   cd ..
   ```
-- Asegúrate de que los emuladores/simuladores estén configurados correctamente.
+- Ejecuta la app nuevamente:
+- Android
+
+```sh
+# Using npm
+npx run android
+
+# OR using Yarn
+yarn android
+```
+
+Ios
+```sh
+# Using npm
+npm run ios
+
+# OR using Yarn
+yarn ios
+```
+
+### Asegúrate de que los emuladores/simuladores estén configurados correctamente.
 
 
