@@ -17,13 +17,17 @@ import com.merkapp.merkapp.security.jwt.JwtAuthFilter;
 @Configuration
 public class WebSecurityConfig {
 
+    //Esta clase configura la aplicación para que suae la configuración con jwt
+
     @Autowired
     public UserDetailsService userDetailsService;
 
+    //Modulo para verificar que se recibe el token en los headers
     @Autowired
     public JwtAuthFilter jwtAuthFilter;
 
     // Reduced whitelist for simplicity
+    //Definirmos en que partes de la aplicación no es necesario la autenticación
     private static final String[] WHITE_LIST_URL = {
             "/api/v1/auth/login",
             "/api/v1/auth/register",
@@ -38,13 +42,16 @@ public class WebSecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                //Desactivamos los Cors y CSFR
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
+                //Implementamos para que permita a lista de WHITE_LIST_URL sin autenticación
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL)
                         .permitAll()
                         .anyRequest()
                         .authenticated())
+                //quitamos las sesiones STATELES para que en cada petición se deba mandar el token
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(userDetailsService)
@@ -53,6 +60,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    //Se usa para autenticar a los usuarios en el servicio de autenticación
     AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }

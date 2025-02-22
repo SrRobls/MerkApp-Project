@@ -25,17 +25,21 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/user")
 public class UserController {
 
-    @Autowired
+    @Autowired //Se usa para inyectar el modulo
     public AuthService authService;
 
     @Autowired
     public UserService userService;
 
+    //Manejara la petcion post para crear y retornar los toknes JWT del usaurio
     @PostMapping("/login")
+    //Los parametros deb ser los mismo que los atributos del DTO (por eso se espera recibir esta instancia)
     public ResponseEntity<Map<String, String>> authRequest(@RequestBody AuthRequestDTO authRequestDto) {
         log.info("AuthResource.authRequest start {}", authRequestDto);
+        //Usamos el metodo de login del authSercive (ver AuthService)
         var userRegistrationResponse = authService.login(authRequestDto);
         log.info("AuthResource.authRequest end {}", userRegistrationResponse);
+        //Si todo salio bien retorn las credenciales de autentciación
         return new ResponseEntity<>(userRegistrationResponse, HttpStatus.OK);
     }
 
@@ -46,6 +50,7 @@ public class UserController {
         try {
             return userService.createUser(userData);
         } catch (IllegalArgumentException e) {
+            //Si ocurre un error, entonces se manda una excepcion que se maneja desde MerkAppApiException
             throw new MerkAppApiException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }

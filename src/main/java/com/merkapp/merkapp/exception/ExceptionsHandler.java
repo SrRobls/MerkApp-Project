@@ -10,17 +10,21 @@ import com.merkapp.merkapp.dtos.response.ResponseError;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
-@ControllerAdvice
-@Hidden
+@ControllerAdvice //Este decorador indica que esta clase manejará todas las excepciones en la API
+@Hidden // Para ocultar su documentación en swagger
 public class ExceptionsHandler {
+    //Esta clae maneja los tipos de excepciones que pueden pasar en la app
 
     @ExceptionHandler(MerkAppApiException.class)
+    //Este metodo captura cualquier excepcion de tipo MerkAppApiException, en la cual recibe el mensaje, y el valor del tipo/codigo del error
+    //y los restorna en un Response
     public ResponseEntity<ResponseError> handleEntrevistaApiException(MerkAppApiException e) {
         ResponseError error = new ResponseError(e.getMessage(), e.getCode().value());
         return new ResponseEntity<>(error, e.getCode());
     }
 
     @ExceptionHandler(value = { HttpMessageNotReadableException.class })
+    // Maneja errores cuando el cuerpo de la solicitud (JSON) es inválido.
     public ResponseEntity<ResponseError> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest().body(new ResponseError(ex.getMessage()));
     }

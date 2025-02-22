@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    //Este modulo intercepta cada solicitud HTTP y verifica si se mandó un token en la encabecera de la solicitud
     private final JwtService jwtService;
 
     @Autowired

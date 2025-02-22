@@ -26,6 +26,7 @@ public class UserService {
     public ResponseEntity<ResponseNewUser> createUser(
             CreateUserDTO userDTO) {
         log.info("Creación de usuario: {} ", userDTO);
+        //Recordemos que los reposritory sirve para interactuar con la entidad en la base de datos y usamos los DTOs para mejor manejor de atributos de estos
         User user = userRepository.findByEmail(userDTO.email());
 
         if (user != null) {
@@ -40,12 +41,14 @@ public class UserService {
                 userDTO.authorities());
 
         log.info("Nuevo user: {}", newUser);
-
+        //Creamos el usuario en dado caso de que todo este bien (por ejemplo; que no haya usuario con el mismo email) y retornamos sus credenciales con la
+        // contraseña encriptada.
         userRepository.save(newUser);
 
         return ResponseEntity.ok(convertUserToDTO(newUser));
     }
 
+    //Usamos este metodo para enviar la respuesta al cliente con las credenciales de usuario creado
     private ResponseNewUser convertUserToDTO(User user) {
         return new ResponseNewUser(
                 user.getId(),

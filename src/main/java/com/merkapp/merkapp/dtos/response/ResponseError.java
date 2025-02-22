@@ -1,7 +1,7 @@
 package com.merkapp.merkapp.dtos.response;
 
 public class ResponseError {
-
+    //Esta clase se usa para manejar las respuestas de los errores
     private String message;
 
     private int code;

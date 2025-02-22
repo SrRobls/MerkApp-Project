@@ -25,9 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JwtService {
 
+    //Desde el applicatión properties nos traemos el secreteKey  que se usa para firmamr los tokens
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
 
+    //Definimos el tiempo de expiración a 1 hora
     @Value("${application.security.jwt.expiration}")
     private long expiration;
 
@@ -62,6 +64,7 @@ public class JwtService {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
+        //Este metodo es importante ya que valida si el token es valido, es decir, si el token no ha expirado y si corresponde al usuario autenticado
         Date expirationDate = extractExpiration(token);
         if (expirationDate.before(new Date())) {
             return false;
@@ -72,6 +75,8 @@ public class JwtService {
 
     public String createToken(Map<String, Object> claims, String username) {
         return Jwts.builder()
+                //Agrema información (como por ejemplo el id, roles, etc) como tambine introducmos en el token su fecha de expiración, el usuario, etc y luego
+                // se genera con compact
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))

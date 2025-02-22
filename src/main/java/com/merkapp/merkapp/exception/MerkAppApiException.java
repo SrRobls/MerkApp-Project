@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 public class MerkAppApiException extends RuntimeException {
+
+    //Esta clase permite lanzar excepciones personalizadas con un mensaje y un código de estado HTTP específico.
     private HttpStatusCode code;
 
     public MerkAppApiException(String message) {
@@ -21,11 +23,13 @@ public class MerkAppApiException extends RuntimeException {
         this.code = code;
     }
 
+    //Usamos este metodo para lanzar la excepción
     public MerkAppApiException(HttpStatusCode code, String message) {
         super(message);
         this.code = code;
     }
 
+    //El codigo de la excepción (400, 200, 500, etc.)
     public HttpStatusCode getCode() {
         return code;
     }
