@@ -2,6 +2,8 @@ package com.merkapp.merkapp.service;
 
 import java.util.Map;
 
+import com.merkapp.merkapp.dtos.response.AuthResponseDTO;
+import com.merkapp.merkapp.security.AuthDetailsService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,15 +23,21 @@ public class AuthService {
     //Gracias @RequiredArgsConstructor lombok nos genera el contructor de estos modulos y asi poderlo inyectar acá
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-
-    public Map<String, String> login(AuthRequestDTO authRequestDto) {
+    private final AuthDetailsService authDetailsService;
+    public AuthResponseDTO login(AuthRequestDTO authRequestDto) {
         log.info("Ingresando al login");
-        //Usamos autenticate que recibe un email y un password y si todo esta bien retorna los detalles de respectivo usuario
-        final var authenticate = authenticationManager.authenticate(
+        // Autenticamos al usuario
+        final var authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequestDto.email(), authRequestDto.password()));
-        final var userDetails = (UserDetails) authenticate.getPrincipal();
-        //Luego retornamos el token con base a los detalles del usuario previamente loggeado
-        return getToken(userDetails);
+        final var userDetails = (UserDetails) authentication.getPrincipal();
+
+        final var token = jwtService.createToken(Map.of("role", userDetails.getAuthorities()), userDetails.getUsername());
+
+
+        var user = authDetailsService.getUserDetail();
+
+
+        return new AuthResponseDTO(token, user.getId(), user.getUsername(), user.getEmail(), user.getAuthorities());
     }
 
     public Map<String, String> getToken(UserDetails userDetails) {

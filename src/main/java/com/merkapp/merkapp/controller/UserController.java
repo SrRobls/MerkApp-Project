@@ -2,6 +2,7 @@ package com.merkapp.merkapp.controller;
 
 import java.util.Map;
 
+import com.merkapp.merkapp.dtos.response.AuthResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,14 +34,11 @@ public class UserController {
 
     //Manejara la petcion post para crear y retornar los toknes JWT del usaurio
     @PostMapping("/login")
-    //Los parametros deb ser los mismo que los atributos del DTO (por eso se espera recibir esta instancia)
-    public ResponseEntity<Map<String, String>> authRequest(@RequestBody AuthRequestDTO authRequestDto) {
+    public ResponseEntity<AuthResponseDTO> authRequest(@RequestBody AuthRequestDTO authRequestDto) {
         log.info("AuthResource.authRequest start {}", authRequestDto);
-        //Usamos el metodo de login del authSercive (ver AuthService)
-        var userRegistrationResponse = authService.login(authRequestDto);
-        log.info("AuthResource.authRequest end {}", userRegistrationResponse);
-        //Si todo salio bien retorn las credenciales de autentciación
-        return new ResponseEntity<>(userRegistrationResponse, HttpStatus.OK);
+        AuthResponseDTO authResponse = authService.login(authRequestDto);
+        log.info("AuthResource.authRequest end {}", authResponse);
+        return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 
     @PostMapping(path = "/signup")

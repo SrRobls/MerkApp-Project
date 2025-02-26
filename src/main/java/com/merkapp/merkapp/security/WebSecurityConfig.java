@@ -3,6 +3,7 @@ package com.merkapp.merkapp.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,58 +12,74 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import com.merkapp.merkapp.security.jwt.JwtAuthFilter;
 
 @Configuration
 public class WebSecurityConfig {
 
-    //Esta clase configura la aplicación para que suae la configuración con jwt
-
     @Autowired
     public UserDetailsService userDetailsService;
 
-    //Modulo para verificar que se recibe el token en los headers
     @Autowired
     public JwtAuthFilter jwtAuthFilter;
 
-    // Reduced whitelist for simplicity
-    //Definirmos en que partes de la aplicación no es necesario la autenticación
-    private static final String[] WHITE_LIST_URL = {
-            "/api/v1/auth/login",
-            "/api/v1/auth/register",
+    private static final String[] PUBLIC_GET_URLS = {
+            "/api/v1/products/**",
+            "/api/v1/stores/**",
             "/swagger-ui/**",
             "/api/v1/api-docs/**",
             "/v3/api-docs/**",
             "/api-docs/**",
             "/swagger-resources/**",
-            "/swagger-resources"
+            "/swagger-resources",
+            "/api/v1/user/**"
+    };
+
+
+    private static final String[] PROTECTED_URLS = {
+            "/api/v1/products/**",
+            "/api/v1/stores/**"
     };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                //Desactivamos los Cors y CSFR
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                //Implementamos para que permita a lista de WHITE_LIST_URL sin autenticación
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(WHITE_LIST_URL)
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
-                //quitamos las sesiones STATELES para que en cada petición se deba mandar el token
+                        // Permitir acceso público para consultas GET
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/stores/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/user/signup/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/user/login/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+
+
+                        // Requerir token para crear, editar o eliminar productos
+                        .requestMatchers(HttpMethod.POST, "/api/v1/products/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").authenticated()
+
+                        // Requerir token para crear, editar o eliminar tiendas
+                        .requestMatchers(HttpMethod.POST, "/api/v1/stores/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/stores/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/stores/**").authenticated()
+
+                        // Otras rutas requerirán autenticación
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(userDetailsService)
                 .build();
-
     }
 
+
+
     @Bean
-    //Se usa para autenticar a los usuarios en el servicio de autenticación
     AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 }

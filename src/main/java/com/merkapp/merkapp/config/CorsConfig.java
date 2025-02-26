@@ -10,20 +10,21 @@ import lombok.extern.slf4j.Slf4j;
 
 //En esta configuración nos encargamos quienes pueden hacer solicitudes al servidor springboot. EN este caso el unico que puede es el dominio respectuvo
 //para Flutter
-@Configuration //Lo usamos para definir configuraciones del servidor springboot, en este caso para definir el comportaminetos de los cors
+@Configuration
 @EnableWebMvc
-@Slf4j //Para mostrar por consola mensajes
+@Slf4j
 public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        log.info(("Ingresando a los COSR"));
+        log.info("Ingresando a los CORS");
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173")
+                .allowedOriginPatterns("*") // Usa esto en lugar de allowedOrigins("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("*") // Permitir cualquier encabezado
-                .exposedHeaders("Access-Control-Allow-Origin") // Exponer el encabezado CORS
-                .allowCredentials(true); //En esta configuración hacemos que se haga la autenticación con tokens (en este caso JWT)
+                .allowedHeaders("*")
+                .exposedHeaders("Authorization", "Access-Control-Allow-Origin")
+                .allowCredentials(true);
     }
-
 }
+
+
