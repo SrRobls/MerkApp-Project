@@ -5,7 +5,7 @@ export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    alignItems: 'center', // Centrado de contenido en la pantalla
+    alignItems: 'stretch', // Centrado de contenido en la pantalla
   },
   text: {
     color: theme.colors.text,
@@ -17,13 +17,15 @@ export const globalStyles = StyleSheet.create({
     fontSize: theme.fontSize.large,
     fontWeight: 'bold',
     marginBottom: theme.spacing.small,
-    textAlign: 'left', // Justificado a la izquierda
+    textAlign: 'left',
+    marginLeft: theme.spacing.medium,
   },
   subtitle: {
     fontSize: theme.fontSize.medium,
     color: theme.colors.textSecondary,
     marginBottom: theme.spacing.medium,
-    textAlign: 'left', // Justificado a la izquierda
+    textAlign: 'left',
+    marginLeft: theme.spacing.medium,
   },
   button: {
     backgroundColor: theme.colors.primary,
@@ -34,6 +36,7 @@ export const globalStyles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     marginTop: theme.spacing.medium,
+    marginLeft: theme.spacing.medium,
   },
   buttonText: {
     color: theme.colors.surface,
@@ -49,13 +52,15 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     marginBottom: theme.spacing.large,
     fontSize: theme.fontSize.medium,
-
+    marginLeft: theme.spacing.medium,
   },
+
   label: {
     fontSize: theme.fontSize.medium,
     color: theme.colors.text,
     marginBottom: theme.spacing.small,
     textAlign: 'left',
+    marginLeft: theme.spacing.medium,
   },
   registerText: {
     marginTop: theme.spacing.large,
@@ -63,6 +68,8 @@ export const globalStyles = StyleSheet.create({
     color: theme.colors.text,
     textAlign: 'center',
     marginBottom: theme.spacing.large,
+    marginLeft: theme.spacing.medium,
+
   },
   bold: {
     fontWeight: 'bold',

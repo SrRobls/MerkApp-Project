@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from '../../styles/global';
 
 export default function LoginScreen() {
+  const navigation = useNavigation();
+
   return (
     <SafeAreaView style={globalStyles.container}>
       {/* Imagen superior */}
@@ -34,7 +37,10 @@ export default function LoginScreen() {
 
         {/* Texto de registro */}
         <Text style={globalStyles.registerText}>
-          ¿No tienes cuenta? <Text style={globalStyles.bold}>Regístrate</Text>
+          ¿No tienes cuenta?{' '}
+          <Text style={globalStyles.bold} onPress={() => navigation.navigate('Register')}>
+            Regístrate
+          </Text>
         </Text>
 
         {/* Logo */}
