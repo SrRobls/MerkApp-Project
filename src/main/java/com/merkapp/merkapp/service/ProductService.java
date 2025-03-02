@@ -6,9 +6,13 @@ import com.merkapp.merkapp.model.Product;
 import com.merkapp.merkapp.model.Store;
 import com.merkapp.merkapp.repository.ProductRepository;
 import com.merkapp.merkapp.repository.StoreRepository;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -16,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -28,28 +33,40 @@ public class ProductService {
         this.s3Service = s3Service;
     }
 
-
     public List<ProductResponseDTO> obtenerProductos() {
-        return productRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        try {
+            return productRepository.findAll().stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+        } catch (org.springframework.orm.jpa.JpaObjectRetrievalFailureException ex) {
+            log.error("Not store found {} {}", ex.getMessage(), ex.getStackTrace());
+            throw new MerkAppApiException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (Exception e) {
+            log.error("{}", e.getMessage());
+            throw new MerkAppApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
-
 
     public ResponseEntity<ProductResponseDTO> obtenerProducto(Long id) {
-        Optional<Product> productOptional = productRepository.findById(id);
-        return productOptional.map(product -> ResponseEntity.ok(convertToDTO(product)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            Optional<Product> productOptional = productRepository.findById(id);
+            return productOptional.map(product -> ResponseEntity.ok(convertToDTO(product)))
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            // TODO: handle exception
+            log.error("{}", e.getMessage());
+            throw new MerkAppApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
-
 
     public List<ProductResponseDTO> obtenerProductosPorTienda(Long storeId) {
         List<Product> products = productRepository.findByStoreId(storeId);
         return products.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-
-    public ResponseEntity<ProductResponseDTO> crearProducto(String name, String description, String category, Double price, Long storeId, MultipartFile imageFile) {
+    public ResponseEntity<ProductResponseDTO> crearProducto(String name, String description, String category,
+            Double price, Long storeId, MultipartFile imageFile)
+            throws MissingServletRequestParameterException {
         Optional<Store> storeOptional = storeRepository.findById(storeId);
 
         if (storeOptional.isEmpty()) {
@@ -57,7 +74,6 @@ public class ProductService {
         }
 
         Store store = storeOptional.get();
-
 
         String imageUrl = s3Service.uploadFile(imageFile);
 
@@ -67,8 +83,8 @@ public class ProductService {
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(savedProduct));
     }
 
-
-    public ResponseEntity<ProductResponseDTO> actualizarProducto(Long id, String name, String description, String category, Double price, MultipartFile imageFile) {
+    public ResponseEntity<ProductResponseDTO> actualizarProducto(Long id, String name, String description,
+            String category, Double price, MultipartFile imageFile) {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isEmpty()) {
             throw new MerkAppApiException(HttpStatus.NOT_FOUND, "Producto no encontrado.");
@@ -79,7 +95,6 @@ public class ProductService {
         product.setDescription(description);
         product.setCategory(category);
         product.setPrice(price);
-
 
         if (imageFile != null && !imageFile.isEmpty()) {
             s3Service.deleteFile(product.getImage());
@@ -100,23 +115,19 @@ public class ProductService {
 
         Product product = productOptional.get();
 
-
         if (product.getImage() != null && !product.getImage().isEmpty()) {
             s3Service.deleteFile(product.getImage());
         }
-
 
         productRepository.deleteById(id);
 
         return ResponseEntity.noContent().build();
     }
 
-
     public List<ProductResponseDTO> obtenerProductosPorCategoria(String category) {
         List<Product> products = productRepository.findByCategoryIgnoreCase(category);
         return products.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
-
 
     private ProductResponseDTO convertToDTO(Product product) {
         return new ProductResponseDTO(
@@ -126,7 +137,6 @@ public class ProductService {
                 product.getCategory(),
                 product.getImage(),
                 product.getPrice(),
-                product.getStore().getName()
-        );
+                product.getStore().getName());
     }
 }

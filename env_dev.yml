@@ -1,0 +1,9 @@
+JWT_SECRET_KEY: wD++ndacrtvfNm2iFZ7ef6HNdkXJpdUO4P/CyCQhTNU=
+AWS_S3_BUCKET_NAME: merkappbucket
+AWS_S3_REGION: us-east-1
+AWS_S3_ACCESS_KEY: AKIAW3MEBJQSC4MGVNEL
+AWS_S3_SECRET_KEY: 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
+
+DATABASE_URI: jdbc:mysql://localhost:3306/merkappdb?useSSL=false&allowPublicKeyRetrieval=true
+DATABASE_USERNAME: merkapp_admin_db
+DATABASE_PASSWORD: merkapp
