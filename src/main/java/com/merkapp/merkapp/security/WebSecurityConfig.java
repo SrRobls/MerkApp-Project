@@ -23,31 +23,13 @@ public class WebSecurityConfig {
     @Autowired
     public JwtAuthFilter jwtAuthFilter;
 
-    private static final String[] PUBLIC_GET_URLS = {
-            "/api/v1/products/**",
-            "/api/v1/stores/**",
-            "/swagger-ui/**",
-            "/api/v1/api-docs/**",
-            "/v3/api-docs/**",
-            "/api-docs/**",
-            "/swagger-resources/**",
-            "/swagger-resources",
-            "/api/v1/user/**"
-    };
-
-
-    private static final String[] PROTECTED_URLS = {
-            "/api/v1/products/**",
-            "/api/v1/stores/**"
-    };
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
+                .cors() // Asegura que CORS esté habilitado
+                .and()
+                .csrf().disable() // Deshabilita CSRF ya que estás usando JWT
                 .authorizeHttpRequests(auth -> auth
-                        // Permitir acceso público para consultas GET
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/stores/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/user/signup/**").permitAll()
@@ -55,19 +37,12 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
-
-
-                        // Requerir token para crear, editar o eliminar productos
                         .requestMatchers(HttpMethod.POST, "/api/v1/products/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").authenticated()
-
-                        // Requerir token para crear, editar o eliminar tiendas
                         .requestMatchers(HttpMethod.POST, "/api/v1/stores/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/stores/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/stores/**").authenticated()
-
-                        // Otras rutas requerirán autenticación
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -75,8 +50,6 @@ public class WebSecurityConfig {
                 .userDetailsService(userDetailsService)
                 .build();
     }
-
-
 
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
