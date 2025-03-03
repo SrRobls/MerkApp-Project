@@ -76,7 +76,7 @@ public class StoreService {
 
 
         if (imageFile != null && !imageFile.isEmpty()) {
-            s3Service.deleteFile(store.getImage());
+
             String newImageUrl = s3Service.uploadFile(imageFile);
             store.setImage(newImageUrl);
         }
@@ -87,15 +87,16 @@ public class StoreService {
 
     public ResponseEntity<Void> eliminarTienda(Long id) {
         Optional<Store> storeOptional = storeRepository.findById(id);
+
         if (storeOptional.isEmpty()) {
             throw new MerkAppApiException(HttpStatus.NOT_FOUND, "Tienda no encontrada.");
         }
 
-        Store store = storeOptional.get();
-        s3Service.deleteFile(store.getImage());
-        storeRepository.deleteById(id);
+        storeRepository.deleteById(id); // ✅ SOLO ELIMINA DE LA BASE DE DATOS
+
         return ResponseEntity.noContent().build();
     }
+
 
 
     private StoreResponseDTO convertToDTO(Store store) {

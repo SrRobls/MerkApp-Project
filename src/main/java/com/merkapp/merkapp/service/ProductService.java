@@ -82,7 +82,7 @@ public class ProductService {
 
 
         if (imageFile != null && !imageFile.isEmpty()) {
-            s3Service.deleteFile(product.getImage());
+
 
             String newImageUrl = s3Service.uploadFile(imageFile);
             product.setImage(newImageUrl);
@@ -101,9 +101,7 @@ public class ProductService {
         Product product = productOptional.get();
 
 
-        if (product.getImage() != null && !product.getImage().isEmpty()) {
-            s3Service.deleteFile(product.getImage());
-        }
+
 
 
         productRepository.deleteById(id);
