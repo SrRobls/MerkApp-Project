@@ -53,21 +53,5 @@ public class S3Service {
     }
 
 
-    public void deleteFile(String fileUrl) {
-        if (fileUrl == null || fileUrl.isEmpty()) {
-            return;
-        }
 
-
-        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-
-        try {
-            s3Client.deleteObject(DeleteObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName)
-                    .build());
-        } catch (Exception e) {
-            throw new RuntimeException("Error al eliminar archivo de S3", e);
-        }
-    }
 }

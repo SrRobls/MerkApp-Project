@@ -1,18 +1,6 @@
 version: '3.8'
+
 services:
-  merkapp:
-    build: .
-    container_name: springboot-app
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql_db:3306/merkappdb
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=merkapp
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.MySQL8Dialect
   db:
     image: mysql:8.0
     container_name: mysql_db
@@ -23,5 +11,33 @@ services:
       - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+    healthcheck:  # 🔹 Agrega un healthcheck para verificar si MySQL está listo
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  merkapp:
+    build: .
+    container_name: springboot-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy  # 🔹 Espera a que MySQL pase el healthcheck
+    env_file:
+      - .env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/merkappdb
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=merkapp
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.MySQL8Dialect
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}
+      - AWS_S3_REGION=${AWS_S3_REGION}
+      - AWS_S3_ACCESS_KEY=${AWS_S3_ACCESS_KEY}
+      - AWS_S3_SECRET_KEY=${AWS_S3_SECRET_KEY}
+
 volumes:
   mysql-data:
