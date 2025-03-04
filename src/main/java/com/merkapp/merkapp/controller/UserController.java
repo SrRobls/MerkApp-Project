@@ -6,6 +6,7 @@ import com.merkapp.merkapp.dtos.response.AuthResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,13 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/user")
 public class UserController {
 
-    @Autowired //Se usa para inyectar el modulo
+    @Autowired // Se usa para inyectar el modulo
     public AuthService authService;
 
     @Autowired
     public UserService userService;
 
-    //Manejara la petcion post para crear y retornar los toknes JWT del usaurio
+    // Manejara la petcion post para crear y retornar los toknes JWT del usaurio
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> authRequest(@RequestBody AuthRequestDTO authRequestDto) {
         log.info("AuthResource.authRequest start {}", authRequestDto);
@@ -48,7 +49,8 @@ public class UserController {
         try {
             return userService.createUser(userData);
         } catch (IllegalArgumentException e) {
-            //Si ocurre un error, entonces se manda una excepcion que se maneja desde MerkAppApiException
+            // Si ocurre un error, entonces se manda una excepcion que se maneja desde
+            // MerkAppApiException
             throw new MerkAppApiException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }

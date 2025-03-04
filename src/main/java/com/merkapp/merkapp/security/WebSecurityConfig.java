@@ -1,6 +1,10 @@
 package com.merkapp.merkapp.security;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,74 +16,60 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+
 import com.merkapp.merkapp.security.jwt.JwtAuthFilter;
 
 @Configuration
 public class WebSecurityConfig {
 
-    @Autowired
-    public UserDetailsService userDetailsService;
+        @Autowired
+        public UserDetailsService userDetailsService;
 
-    @Autowired
-    public JwtAuthFilter jwtAuthFilter;
+        @Autowired
+        public JwtAuthFilter jwtAuthFilter;
 
-    private static final String[] PUBLIC_GET_URLS = {
-            "/api/v1/products/**",
-            "/api/v1/stores/**",
-            "/swagger-ui/**",
-            "/api/v1/api-docs/**",
-            "/v3/api-docs/**",
-            "/api-docs/**",
-            "/swagger-resources/**",
-            "/swagger-resources",
-            "/api/v1/user/**"
-    };
+        @Bean
+        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                return http
 
+                                .csrf(AbstractHttpConfigurer::disable) // Deshabilita CSRF si estás usando JWT
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/api/v1/products/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/stores/").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/user/signup/").permitAll()
+                                                .requestMatchers("/api/v1/user/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/swagger-ui/").permitAll())
+                                .httpBasic(AbstractHttpConfigurer::disable)
+                                .formLogin(AbstractHttpConfigurer::disable)
+                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                                .userDetailsService(userDetailsService)
+                                .build();
+        }
 
-    private static final String[] PROTECTED_URLS = {
-            "/api/v1/products/**",
-            "/api/v1/stores/**"
-    };
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration config = new CorsConfiguration();
+                // config.addAllowedOriginPattern("*");
+                config.addAllowedOriginPattern("*");
+                config.addAllowedMethod("*");
+                config.addAllowedHeader("*");
+                config.setAllowCredentials(false);
+                config.setExposedHeaders(List.of("Access-Control-Allow-Origin"));
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", config);
+                return source;
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        // Permitir acceso público para consultas GET
-                        .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/stores/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/user/signup/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/user/login/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+        }
 
-
-                        // Requerir token para crear, editar o eliminar productos
-                        .requestMatchers(HttpMethod.POST, "/api/v1/products/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").authenticated()
-
-                        // Requerir token para crear, editar o eliminar tiendas
-                        .requestMatchers(HttpMethod.POST, "/api/v1/stores/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/stores/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/stores/**").authenticated()
-
-                        // Otras rutas requerirán autenticación
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .userDetailsService(userDetailsService)
-                .build();
-    }
-
-
-
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+        @Bean
+        AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+                return config.getAuthenticationManager();
+        }
 }
