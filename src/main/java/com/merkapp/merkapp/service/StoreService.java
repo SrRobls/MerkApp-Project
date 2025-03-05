@@ -1,9 +1,11 @@
 package com.merkapp.merkapp.service;
 
 import com.merkapp.merkapp.dtos.request.StoreDTO;
+import com.merkapp.merkapp.dtos.response.ProductResponseDTO;
 import com.merkapp.merkapp.dtos.response.StoreResponseDTO;
 import com.merkapp.merkapp.enums.Role;
 import com.merkapp.merkapp.exception.MerkAppApiException;
+import com.merkapp.merkapp.model.Product;
 import com.merkapp.merkapp.model.Store;
 import com.merkapp.merkapp.model.User;
 import com.merkapp.merkapp.repository.StoreRepository;
@@ -30,7 +32,6 @@ public class StoreService {
         this.s3Service = s3Service;
     }
 
-
     public List<StoreResponseDTO> obtenerTiendas() {
         return storeRepository.findAll().stream()
                 .map(this::convertToDTO)
@@ -43,7 +44,6 @@ public class StoreService {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
     public ResponseEntity<StoreResponseDTO> crearTienda(StoreDTO storeDTO, MultipartFile imageFile) {
         Optional<User> ownerOptional = userRepository.findById(storeDTO.getOwnerId());
 
@@ -55,10 +55,10 @@ public class StoreService {
             throw new MerkAppApiException(HttpStatus.CONFLICT, "Ya existe una tienda con ese nombre.");
         }
 
-
         String imageUrl = s3Service.uploadFile(imageFile);
 
-        Store store = new Store(storeDTO.getName(), storeDTO.getLocation(), storeDTO.getDescription(), imageUrl, ownerOptional.get());
+        Store store = new Store(storeDTO.getName(), storeDTO.getLocation(), storeDTO.getDescription(), imageUrl,
+                ownerOptional.get());
         Store savedStore = storeRepository.save(store);
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(savedStore));
     }
@@ -73,7 +73,6 @@ public class StoreService {
         store.setName(storeDTO.getName());
         store.setLocation(storeDTO.getLocation());
         store.setDescription(storeDTO.getDescription());
-
 
         if (imageFile != null && !imageFile.isEmpty()) {
 
@@ -97,8 +96,6 @@ public class StoreService {
         return ResponseEntity.noContent().build();
     }
 
-
-
     private StoreResponseDTO convertToDTO(Store store) {
         return new StoreResponseDTO(
                 store.getId(),
@@ -107,11 +104,19 @@ public class StoreService {
                 store.getDescription(),
                 store.getImage(),
                 store.getOwner().getUsername(),
-                store.getProducts() != null ?
-                        store.getProducts().stream()
-                                .map(product -> product.getName())
-                                .collect(Collectors.toList()) :
-                        null
-        );
+                store.getProducts() != null ? store.getProducts().stream()
+                        .map(product -> convertToDTOProduct(product))
+                        .collect(Collectors.toList()) : null);
+    }
+
+    private ProductResponseDTO convertToDTOProduct(Product product) {
+        return new ProductResponseDTO(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getCategory(),
+                product.getImage(),
+                product.getPrice(),
+                product.getStore().getId());
     }
 }
