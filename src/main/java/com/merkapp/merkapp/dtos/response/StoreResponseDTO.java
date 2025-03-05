@@ -1,5 +1,6 @@
 package com.merkapp.merkapp.dtos.response;
 
+import com.merkapp.merkapp.dtos.response.ProductResponseDTO;
 import lombok.Getter;
 import lombok.Setter;
 
