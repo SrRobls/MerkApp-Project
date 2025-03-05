@@ -12,15 +12,16 @@ public class ProductResponseDTO {
     private String category;
     private String image;
     private Double price;
-    private String storeName;
+    private Long storeId;
 
-    public ProductResponseDTO(Long id, String name, String description, String category, String image, Double price, String storeName) {
+    public ProductResponseDTO(Long id, String name, String description, String category, String image, Double price,
+            Long storeId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.category = category;
         this.image = image;
         this.price = price;
-        this.storeName = storeName;
+        this.storeId = storeId;
     }
 }

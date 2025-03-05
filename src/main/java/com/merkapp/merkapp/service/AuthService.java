@@ -7,7 +7,6 @@ import com.merkapp.merkapp.exception.MerkAppApiException;
 import com.merkapp.merkapp.security.AuthDetailsService;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

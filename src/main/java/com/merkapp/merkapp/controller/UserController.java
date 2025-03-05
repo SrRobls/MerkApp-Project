@@ -1,12 +1,9 @@
 package com.merkapp.merkapp.controller;
 
-import java.util.Map;
-
 import com.merkapp.merkapp.dtos.response.AuthResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

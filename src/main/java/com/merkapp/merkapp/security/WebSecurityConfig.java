@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 import com.merkapp.merkapp.security.jwt.JwtAuthFilter;
 
@@ -42,8 +40,7 @@ public class WebSecurityConfig {
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/api/v1/products/**").permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/stores/").permitAll()
-                                                .requestMatchers(HttpMethod.POST, "/api/v1/user/signup/").permitAll()
+                                                .requestMatchers("/api/v1/stores/**").permitAll()
                                                 .requestMatchers("/api/v1/user/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/swagger-ui/").permitAll())
                                 .httpBasic(AbstractHttpConfigurer::disable)
